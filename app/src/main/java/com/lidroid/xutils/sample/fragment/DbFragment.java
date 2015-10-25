@@ -31,10 +31,15 @@ import java.util.List;
  */
 public class DbFragment extends Fragment {
 
+    private DbUtils db;             //数据库设置
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.db_fragment, container, false);
         ViewUtils.inject(this, view);
+
+        db = DbUtils.create(this.getActivity());
+        db.configAllowTransaction(true);
+        db.configDebug(true);
 
         return view;
     }
@@ -132,9 +137,6 @@ public class DbFragment extends Fragment {
         detail.setNewstime(100000000);
         detail.setNewscontent("测试测试内容<html><body><a href=\"www.baidu.com\">百度地址</a><br/><p>就这样</p></body></html>");
 
-        DbUtils db = DbUtils.create(this.getActivity());
-        db.configAllowTransaction(true);
-        db.configDebug(true);
         try {
 
             db.saveBindingId(detail);
@@ -161,5 +163,33 @@ public class DbFragment extends Fragment {
     @OnClick(R.id.db_test_btn)
     public void testDb(View view) {
         testDbName();
+    }
+
+    @OnClick(R.id.select_btn)
+    public void selectResult(View view) {
+        try {
+            NewsDetail detail = db.findFirst(Selector.from(NewsDetail.class).where("newsid","in",new String[]{"102","newsId2"}));
+
+            if(detail != null){
+//                resultText.setText(detail.toString());
+            }
+        } catch (DbException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            List<NewsDetail> list = db.findAll(Selector.from(NewsDetail.class).orderBy("newsid",true).limit(10));
+            if(list != null){
+                int length = list.size();
+                String resultStr="";
+                for (int i=0;i<length;i++){
+                    NewsDetail detail = list.get(i);
+                    resultStr += detail.toString();
+                }
+                resultText.setText(resultStr);
+            }
+        } catch (DbException e) {
+            e.printStackTrace();
+        }
     }
 }

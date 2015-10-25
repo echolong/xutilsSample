@@ -61,4 +61,10 @@ public class NewsDetail {
     public void setNewscontent(String newscontent) {
         this.newscontent = newscontent;
     }
+
+    @Override
+    public String toString() {
+        String str = "newsId:"+newsId+",newsType:"+newstype+",newsTime:"+newstime+",newsContent:"+newscontent;
+        return str;
+    }
 }
